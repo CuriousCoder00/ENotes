@@ -1,39 +1,69 @@
 import Home from "./Components/Home";
 import Navbar from "./Components/Navbar";
 import About from "./Components/About";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import './App.css';
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import { useState } from "react";
 import NoteState from "./Context/Notes/NoteState";
 import { Alert } from "./Components/Alert";
 import Login from "./Components/Login";
 
-function App() {
-  const [theme, setTheme] = useState("light");
+const PrivateRoute = ({ isAuthenticated, isUserAuthenticated, ...props }) => {
+  return isAuthenticated ? (
+    <>
+      <Navbar isUserAuthenticated={isUserAuthenticated}/>
+      <Outlet />
+    </>
+  ) : (
+    <Navigate replace to="/account" />
+  );
+};
 
-  const toggleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-      document.body.style.background = "#0c0c1f";
-      document.body.style.color = "white";
-    } else {
-      setTheme("light");
-      document.body.style.background = "white";
-      document.body.style.color = "black";
-    }
-  };
+function App() {
+  const [isAuthenticated, isUserAuthenticated] = useState(false);
+  const [theme, setTheme] = useState("dark");
+
+  // const toggleTheme = () => {
+  //   if (theme === "light") {
+  //     setTheme("dark");
+  //     document.body.style.background = "#0c0c1f";
+  //     document.body.style.color = "white";
+  //   } else {
+  //     setTheme("light");
+  //     document.body.style.background = "white";
+  //     document.body.style.color = "black";
+  //   }
+  // };
 
   return (
     <NoteState>
       <Router>
-        <Navbar theme={theme} toggleTheme={toggleTheme} />
-        <Alert />
-        <div className="container">
           <Routes>
-            <Route exact path="/" element={<Home theme={theme} />} />
-            <Route exact path="/about" element={<About />} />
-            <Route exact path="/login" element={<Login/>} />
+            <Route
+              path="/account"
+              element={<Login isUserAuthenticated={isUserAuthenticated} />}
+            />
+            <Route
+              path="/"
+              element={<PrivateRoute isAuthenticated={isAuthenticated} />}
+            >
+              <Route path="/" element={<Home theme={theme} />} />
+            </Route>
+            <Route
+              path="/"
+              element={<PrivateRoute isAuthenticated={isAuthenticated} />}
+            >
+              <Route path="/about" element={<About />} />
+            </Route>
           </Routes>
-        </div>
       </Router>
     </NoteState>
   );

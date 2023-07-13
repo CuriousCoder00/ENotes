@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from 'axios';
 const loginInitialValues = {
   email: " ",
   password: " ",
@@ -12,10 +12,12 @@ const signupInitialValues = {
   password: " ",
 };
 
-const Login = () => {
+const Login = (props) => {
   const [account, toggleAccount] = useState("login");
   const [signup, setSignup] = useState(signupInitialValues);
   const [login, setLogin] = useState(loginInitialValues);
+
+const { isUserAuthenticated } = props;
 
   const navigate = useNavigate();
 
@@ -24,46 +26,45 @@ const Login = () => {
   };
   const onInputChange = (e) => {
     setSignup({ ...signup, [e.target.name]: e.target.value });
-    console.log({[e.target.name]: e.target.value })
+    console.log({ [e.target.name]: e.target.value });
   };
 
   const toggleSignup = () => {
     account === "signup" ? toggleAccount("login") : toggleAccount("signup");
   };
 
-  const userLogin = async () => {
-    const response = await fetch("http://localhost:5000/api/auth/login", {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({email: login.email, password: login.password})
-  });
-    const json = await response.json();
-    console.log(json);
-    if(response.isSuccess){
-      localStorage.setItem('token', json.authToken);
+  const userLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login",{
+        email: login.email,
+        password: login.password
+      });
+      const { authToken } = res.data;
+      if (!authToken ) throw new Error('Invalid credentials');
+      localStorage.setItem("authToken", authToken);
+
       navigate('/');
-
-    } else {
-      alert("Invalid Credentials");
+      isUserAuthenticated(true);
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
 
-  const signupUser = async () => {
-    const response = await fetch("http://localhost:5000/api/auth/createuser", {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({name: signup.name, email: signup.email, password: signup.password})
-  });
-    const json = await response.json();
-    if(json.isSuccess){
-      setSignup(signupInitialValues);
+  const signupUser = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/createuser", {
+        name: signup.name,
+        email: signup.email,
+        password: signup.password,
+      });
+      const { authToken } = res.data;
+      if (!authToken) throw new Error('Invalid credentials');
+      localStorage.setItem("authToken", authToken);
       toggleAccount('login');
-    } else {
-      alert("Something went wrong");
+    } catch (error) {
+      console.error(error);
     }
   };
   return (
@@ -108,7 +109,9 @@ const Login = () => {
             />
           </div>
           <div className="container mx-auto text-center">
-            <button className="btn btn-primary" onClick={userLogin}>Login</button>
+            <button className="btn btn-primary" onClick={userLogin}>
+              Login
+            </button>
             <p className="text-secondary mt-3">OR</p>
             <button
               type="submit"
@@ -125,7 +128,13 @@ const Login = () => {
             <label className="form-label" htmlFor="name">
               Name
             </label>
-            <input type="text" className="form-control" id="name" name="name" onChange={onInputChange}/>
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
+              onChange={onInputChange}
+            />
           </div>
           <div className="mb-3">
             <label htmlFor="signupEmail" className="form-label">
@@ -153,7 +162,11 @@ const Login = () => {
             />
           </div>
           <div className="container mx-auto text-center">
-            <button type="submit" className="btn btn-primary" onClick={signupUser}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              onClick={signupUser}
+            >
               Singup
             </button>
             <p className="text-secondary mt-3">OR</p>

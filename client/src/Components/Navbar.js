@@ -1,10 +1,17 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-
+import axios from 'axios';
 const Navbar = (props) => {
+
+  const handleLogout = (props) => {
+    localStorage.removeItem("authToken");
+    axios.defaults.headers.common['Authorization'] = '';
+    props.isUserAuthenticated(false);
+  }
   let location = useLocation();
   return (
-    <nav className={`navbar border-bottom navbar-${props.theme==="dark"?"dark":"light"} navbar-expand-md bg-body-tertiary`} data-bs-theme={`${props.theme==="dark"?"dark":"light"}`}>
+    <nav className={`navbar border-bottom navbar-dark
+     navbar-expand-md bg-body-tertiary`} data-bs-theme="dark">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">ENotes</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,13 +25,16 @@ const Navbar = (props) => {
             <li className="nav-item">
               <Link className={`nav-link ${location.pathname==="/about"?"active":""}`} to="/about">About</Link>
             </li>
+            <li className="nav-item">
+              <Link className={`nav-link`} onClick={handleLogout}>Logout</Link>
+            </li>
           </ul>
-          <form className="d-flex align-items-center" role="search">
+          {/* <form className="d-flex align-items-center" role="search">
           <div className="form-check form-switch">
             <input className="form-check-input" type="checkbox" role="switch" id="theme" onClick={props.toggleTheme} style={{cursor:"pointer"}}/>
             <label className={`form-check-label text-${props.theme==="dark"?"light":"dark"}`} htmlFor="theme">{props.theme==="dark"?"Light":"Dark"} Mode</label>
           </div>
-          </form>
+          </form> */}
         </div>
       </div>
     </nav>

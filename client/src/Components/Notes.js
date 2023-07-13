@@ -56,9 +56,9 @@ const Notes = (props) => {
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className="modal-dialog bg-dark">
+          <div className="modal-content bg-dark">
+            <div className="modal-header bg-dark">
               <h5 className="modal-title" id="exampleModalLabel">
                 Edit Note
               </h5>
@@ -77,7 +77,7 @@ const Notes = (props) => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control bg-dark text-light"
                     id="etitle"
                     name="etitle"
                     value={note.etitle}
@@ -93,7 +93,7 @@ const Notes = (props) => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control bg-dark text-light"
                     id="edescription"
                     name="edescription"
                     value={note.edescription}
@@ -108,7 +108,7 @@ const Notes = (props) => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control bg-dark text-light"
                     id="etag"
                     name="etag"
                     value={note.etag}
